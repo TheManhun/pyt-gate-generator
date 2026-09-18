@@ -6,7 +6,7 @@
 > behind it.
 
 This is for Transport Fever 2 modders who want to ship their own toll
-gate models (Singapore ERP gantries, French péage plazas, anything) and
+gate models (any style, any era) and
 have Pay Your Tolls count the traffic through them, charge the tolls,
 and list them in its Toll Ways table. You write no script and take no
 dependency: with Pay Your Tolls absent, your gate is simply a
@@ -24,7 +24,7 @@ Ship your gate as a normal construction whose file name starts with
 That prefix is the whole contract. Put YOUR MOD NAME after it, as
 shown: two modders who both ship `pyt_gate_erp_gantry.con` would be
 shipping the same path, and the game would load only one of them.
-`pyt_gate_singapore_tolls_erp_gantry.con` can never collide. Pay Your Tolls scans placed
+`pyt_gate_yourmodname_yourgate.con` can never collide. Pay Your Tolls scans placed
 constructions every ten seconds and treats every `asset/pyt_gate_*.con`
 as a toll gate, exactly like its own.
 
@@ -71,7 +71,7 @@ function data()
     return {
         type = "STREET_CONSTRUCTION",
         description = {
-            name = _("My ERP Gantry"),
+            name = _("My Toll Gate"),
             description = _("A toll gantry. Drop it onto a road you own. Pay Your Tolls compatible."),
         },
         availability = { yearFrom = 1998, yearTo = 0 },
@@ -96,7 +96,7 @@ function data()
             result.terrainAlignmentLists = {} -- pure overlay
             result.models = {
                 {
-                    id = "mymod/my_erp_gantry.mdl",
+                    id = "your_mod/your_gate.mdl",
                     transf = transf.scaleRotZYXTransl(
                         vec3.new(1.0, 1.0, 1.0),
                         transf.degToRad(0.0, 0.0, 0.0),
@@ -113,7 +113,7 @@ function data()
 end
 ```
 
-Save it as `res/construction/asset/pyt_gate_mymod_erp_gantry.con`, ship
+Save it as `res/construction/asset/pyt_gate_yourmodname_yourgate.con`, ship
 your `.mdl`, meshes and materials as usual, and you are done. A gate
 that builds its own road works the same way; only the prefix matters.
 

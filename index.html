@@ -220,23 +220,23 @@
       <fieldset>
         <legend>Gate</legend>
         <div class="row">
-          <label class="f"><span>Your mod name</span>
-            <input type="text" id="modname" value="my_mod" maxlength="40" spellcheck="false">
-            <div class="hint">Goes into the file name so it can never collide with another modder's gate.</div>
+          <label class="f"><span>Mod name</span>
+            <input type="text" id="modname" value="Your Mod Name" maxlength="40" spellcheck="false">
+            <div class="hint">Type your mod's name here. It becomes part of the file name so your gate can never collide with another modder's.</div>
           </label>
           <label class="f"><span>Gate name</span>
-            <input type="text" id="name" value="Singapore ERP Gantry" maxlength="60">
-            <div class="hint">Shown in the build menu.</div>
+            <input type="text" id="name" value="Your Gate Name" maxlength="60">
+            <div class="hint">Type your gate's name here. It is shown in the build menu.</div>
           </label>
         </div>
         <div class="row one">
           <label class="f"><span>Description</span>
-            <input type="text" id="desc" value="An electronic road-pricing gantry. Drop it onto a road you own. Pay Your Tolls compatible." maxlength="240">
+            <input type="text" id="desc" value="A toll gate. Drop it onto a road you own. Pay Your Tolls compatible." maxlength="240">
           </label>
         </div>
         <div class="row one">
           <label class="f"><span>Model path</span>
-            <input type="text" id="model" value="my_mod/singapore_erp.mdl" spellcheck="false">
+            <input type="text" id="model" value="your_mod/your_gate.mdl" spellcheck="false">
             <div class="hint">Relative to your mod's <b>res/models/model/</b>, ending in .mdl</div>
           </label>
         </div>
@@ -325,7 +325,7 @@
 
     <div class="out">
       <div class="filebar">
-        <div class="path">res/construction/asset/<b id="fileName">pyt_gate_my_mod_singapore_erp_gantry.con</b></div>
+        <div class="path">res/construction/asset/<b id="fileName">pyt_gate_your_mod_name_your_gate_name.con</b></div>
         <div class="actions">
           <span class="toast" id="toast" aria-live="polite"></span>
           <button type="button" class="btn" id="copyBtn">Copy code</button>
@@ -342,7 +342,7 @@
       <section class="next">
         <h2>Then, in your mod</h2>
         <ol>
-          <li>Save the file as <code id="fileName2">pyt_gate_my_mod_singapore_erp_gantry.con</code> inside <code>res/construction/asset/</code>. The <code>pyt_gate_</code> prefix is what makes it a toll gate. Never rename it after publishing: the path lives in players' saves.</li>
+          <li>Save the file as <code id="fileName2">pyt_gate_your_mod_name_your_gate_name.con</code> inside <code>res/construction/asset/</code>. The <code>pyt_gate_</code> prefix is what makes it a toll gate. Never rename it after publishing: the path lives in players' saves.</li>
           <li>Ship your .mdl, meshes, materials and textures as for any construction.</li>
           <li>Do not list Pay Your Tolls as a dependency. Your gate works without it.</li>
           <li>Add "Pay Your Tolls compatible" to your Workshop page with a link back here or to the Pay Your Tolls Workshop page. That credit is the only thing the licence asks for. Players who have both mods will see the gate counted, named and listed in the Toll Ways table.</li>
