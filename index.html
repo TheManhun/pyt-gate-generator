@@ -602,9 +602,9 @@
 (() => {
   // Anonymous visit counter. Publishable/anon key, safe to ship in a
   // static page -- it can only do what the table's RLS policies allow
-  // (insert a visit row; count distinct sessions via a SECURITY DEFINER
-  // function that never exposes the raw rows). See the repo's
-  // supabase/README for the SQL this depends on.
+  // (insert a visit row; read aggregate counts back via the
+  // SECURITY DEFINER get_pyt_stats() function, never the raw rows).
+  // See supabase_setup.sql for the schema this depends on.
   const SUPABASE_URL = "https://aijqcrrcreectihaeqoc.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_R3nt2zIP1QF6iJiGfJ220A_zX3JTQ0_";
 
@@ -628,12 +628,12 @@
     .then(() => {})
     .catch(() => {});
 
-  sb.rpc("get_visit_count")
+  sb.rpc("get_pyt_stats")
     .then(({ data, error }) => {
-      if (error || typeof data !== "number") return;
+      if (error || !data || typeof data.unique_visitors !== "number") return;
       const el = document.getElementById("visitCount");
       const wrap = document.getElementById("visitCounter");
-      if (el) el.textContent = data.toLocaleString();
+      if (el) el.textContent = data.unique_visitors.toLocaleString();
       if (wrap) wrap.hidden = false;
     })
     .catch(() => {});
