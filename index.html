@@ -661,7 +661,7 @@
     const m = Math.max(0, Math.floor((Date.now() - POSTED) / 60000));
     ageEl.innerHTML = "<strong>" + plural(Math.floor(m / 1440), "day") + " " +
       plural(Math.floor(m / 60) % 24, "hour") + " " + plural(m % 60, "minute") +
-      "</strong> since first posted on Steam";
+      "</strong> since Steam release";
   };
   tickAge();
   setInterval(tickAge, 30000);
