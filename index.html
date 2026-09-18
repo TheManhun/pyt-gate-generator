@@ -354,6 +354,7 @@
   <footer class="fine">
     <p>Contract version 1. Pay Your Tolls reads only the construction's file name prefix and its optional <code>ways</code>, <code>lanes</code> and <code>pyt_era</code> parameters. Pricing, revenue, saves, naming and the UI stay with Pay Your Tolls, so a broken pack can never damage a save.</p>
     <p><strong>Licence.</strong> The compatibility system, this generator and everything it produces are free to use and modify in any Transport Fever 2 mod, provided you credit "Pay Your Tolls" with a link to its <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3800813265">Workshop page</a> or this page, and do not present the system as your own. Your own models and assets stay yours. No dependency on Pay Your Tolls is required or expected. Full text: <a href="LICENSE.txt">PYT Compatibility Licence v1</a>.</p>
+    <p id="visitCounter" hidden>Visited by <strong id="visitCount">&mdash;</strong> modders so far.</p>
   </footer>
 </div>
 
@@ -593,6 +594,49 @@
   let startAdvanced = false;
   try { startAdvanced = localStorage.getItem("pytgen.mode") === "advanced"; } catch (e) {}
   setMode(startAdvanced);
+})();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(() => {
+  // Anonymous visit counter. Publishable/anon key, safe to ship in a
+  // static page -- it can only do what the table's RLS policies allow
+  // (insert a visit row; count distinct sessions via a SECURITY DEFINER
+  // function that never exposes the raw rows). See the repo's
+  // supabase/README for the SQL this depends on.
+  const SUPABASE_URL = "https://aijqcrrcreectihaeqoc.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_R3nt2zIP1QF6iJiGfJ220A_zX3JTQ0_";
+
+  if (typeof supabase === "undefined") return;
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let sessionId = null;
+  try {
+    sessionId = localStorage.getItem("pytgen.session");
+    if (!sessionId) {
+      sessionId = crypto.randomUUID();
+      localStorage.setItem("pytgen.session", sessionId);
+    }
+  } catch (e) {
+    sessionId = crypto.randomUUID();
+  }
+
+  sb.from("pyt_generator_visits")
+    .insert({ referrer: document.referrer || null, page: location.pathname, session_id: sessionId })
+    .then(() => {})
+    .catch(() => {});
+
+  sb.rpc("get_visit_count")
+    .then(({ data, error }) => {
+      if (error || typeof data !== "number") return;
+      const el = document.getElementById("visitCount");
+      const wrap = document.getElementById("visitCounter");
+      if (el) el.textContent = data.toLocaleString();
+      if (wrap) wrap.hidden = false;
+    })
+    .catch(() => {});
 })();
 </script>
 
