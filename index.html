@@ -154,6 +154,16 @@
   .filebar .path { font-family: "JetBrains Mono", Consolas, monospace; font-size: 13px; color: var(--ink-2); }
   .filebar .path b { color: var(--ink); font-weight: 500; }
   .filebar .actions { margin-left: auto; display: flex; gap: 8px; }
+  .badges { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 8px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600;
+    padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  }
+  .badge b { font-weight: 600; }
+  .badge.ok { border-color: var(--ok); }
+  .badge.ok::before { content: "\2713"; color: var(--ok); font-weight: 700; }
+  .badge.rule::before { content: "\25CE"; color: var(--accent); font-weight: 700; }
+  .badge span { font-weight: 400; color: var(--ink-2); }
   .btn {
     font: inherit; font-weight: 600; border-radius: 6px; padding: 7px 14px; cursor: pointer;
     border: 1px solid var(--line); background: var(--surface); color: var(--ink);
@@ -314,6 +324,10 @@
           <span class="toast" id="toast" aria-live="polite"></span>
           <button type="button" class="btn" id="copyBtn">Copy code</button>
           <button type="button" class="btn primary" id="dlBtn">Download .con</button>
+        </div>
+        <div class="badges">
+          <div class="badge ok" id="badgeName"><b>PYT compatible file name</b><span>starts with pyt_gate_</span></div>
+          <div class="badge rule"><b>Detection centre</b><span>construction origin, 18 m radius. Keep it on the road centreline.</span></div>
         </div>
       </div>
       <pre class="code" id="code" tabindex="0" aria-label="Generated construction file"></pre>
