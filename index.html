@@ -220,7 +220,7 @@
     </div>
   </header>
 
-  <p class="proof">Pay Your Tolls is currently used by <strong>1,136 players</strong> on Steam. <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3800813265">Workshop page</a></p>
+  <p class="proof">Pay Your Tolls is currently used by <strong><span id="steamSubs">1,136</span> players</strong> on Steam. <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3800813265">Workshop page</a></p>
 
   <p class="intro">Fill in the form and the finished <strong>.con</strong> file writes itself on the right. Nothing is sent anywhere; this page runs entirely in your browser. Save the file into your mod under <strong>res/construction/asset/</strong> with the name shown, ship your model as usual, and Pay Your Tolls will find the gate, count every vehicle through it and charge the toll. <strong>No script, no dependency</strong>: without Pay Your Tolls your gate is simply a decoration.</p>
 
@@ -645,6 +645,21 @@
       const wrap = document.getElementById("visitCounter");
       if (el) el.textContent = data.unique_visitors.toLocaleString();
       if (wrap) wrap.hidden = false;
+    })
+    .catch(() => {});
+
+  // Live Steam subscriber count, written by the local PYT Steam Stats Sync
+  // app into pyt_steam_stats (anon has SELECT only). On any failure the
+  // hardcoded number in the page stays as the fallback.
+  sb.from("pyt_steam_stats")
+    .select("current_subscribers")
+    .eq("id", 1)
+    .maybeSingle()
+    .then(({ data, error }) => {
+      const n = data && data.current_subscribers;
+      if (error || typeof n !== "number" || n <= 0) return;
+      const el = document.getElementById("steamSubs");
+      if (el) el.textContent = n.toLocaleString();
     })
     .catch(() => {});
 })();
