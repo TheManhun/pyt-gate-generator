@@ -15,3 +15,10 @@ The full contract for hand-written files is in
 [PYT_COMPATIBLE_GATES.md](PYT_COMPATIBLE_GATES.md).
 
 The page is a single static `index.html`. Pull requests welcome.
+
+## Licence
+
+Free to use and modify in any Transport Fever 2 mod, with a credit to
+"Pay Your Tolls" and a link to its Workshop page or this page. Your own
+models and assets stay yours. No dependency required. Full text:
+[LICENSE.txt](LICENSE.txt).

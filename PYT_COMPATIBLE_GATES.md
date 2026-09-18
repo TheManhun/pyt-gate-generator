@@ -138,3 +138,16 @@ player runs Pay Your Tolls alone or both mods together.
 Contract version 1, Pay Your Tolls 2 (v1.1, Decision 103). The prefix
 and the three param keys will not change meaning; anything added later
 will be a new key, never a redefinition.
+
+## Licence
+
+The compatibility system, the generator and everything it produces are
+free to use and modify in any Transport Fever 2 mod, provided you
+credit "Pay Your Tolls" with a link to its Workshop page
+(https://steamcommunity.com/sharedfiles/filedetails/?id=3800813265) or
+the compatibility page (https://themanhun.github.io/pyt-gate-generator/),
+keep the generated header comment, and do not present the system as
+your own. Your own models and assets stay yours. No dependency on Pay
+Your Tolls is required or expected. Full text: LICENSE.txt (PYT
+Compatibility Licence v1).
+

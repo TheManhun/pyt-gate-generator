@@ -1,0 +1,54 @@
+PYT Compatibility Licence, version 1
+Pay Your Tolls is a Transport Fever 2 mod by Epod.
+
+WHAT THIS COVERS
+The Pay Your Tolls compatibility system: the pyt_gate_ file-name
+contract, the ways / lanes / pyt_era parameter convention, the PYT Gate
+Generator (this page and repository), every construction file the
+generator produces, and the example construction in the compatibility
+guide.
+
+It does NOT cover the Pay Your Tolls mod itself (its scripts, models,
+textures, icons and artwork). Those remain Epod's, and are available
+only through the Steam Workshop under its terms.
+
+YOU MAY
+- Use the compatibility system in any Transport Fever 2 mod, free of
+  charge, including mods you distribute in any way.
+- Modify the generated files and the example construction as much as
+  you like.
+
+YOU MUST
+- Credit "Pay Your Tolls" in your mod's Workshop or mod.io description,
+  with a link to the Pay Your Tolls Workshop page
+  (https://steamcommunity.com/sharedfiles/filedetails/?id=3800813265)
+  or the compatibility page (https://themanhun.github.io/pyt-gate-generator/).
+  The suggested wording is simply:
+
+      Pay Your Tolls compatible
+      Uses the Pay Your Tolls compatibility system:
+      https://themanhun.github.io/pyt-gate-generator/
+
+- Keep the "Pay Your Tolls compatible" header comment in any generated
+  or derived construction file.
+
+YOU MUST NOT
+- Present the compatibility system, the generator, or a generated
+  template as your own original system.
+
+YOU DO NOT HAVE TO
+- Make Pay Your Tolls a dependency of your mod, or say it requires
+  Pay Your Tolls. It does not; the whole design is that your gate
+  works without it.
+
+YOUR OWN WORK
+Your models, textures and every other asset of your own remain yours,
+under whatever terms you choose.
+
+NO WARRANTY
+The compatibility system and the generator are provided as they are,
+with no warranty of any kind. Use at your own risk.
+
+These are plain-language terms written by the Pay Your Tolls authors,
+not legal advice. If you need something more formal for your project,
+ask before publishing.
