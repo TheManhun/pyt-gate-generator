@@ -98,6 +98,14 @@
   header.top .mode button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
   header.top .mode button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
 
+  .proof {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2);
+    background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 999px;
+    padding: 5px 14px; margin-top: 16px;
+  }
+  .proof strong { color: var(--ink); }
+  .proof a { color: var(--ink); }
+
   .intro { color: var(--ink-2); max-width: 68ch; margin-block: 16px 22px; }
   .intro strong { color: var(--ink); }
 
@@ -211,6 +219,8 @@
       <button type="button" id="modeAdvanced" aria-pressed="false">Advanced</button>
     </div>
   </header>
+
+  <p class="proof">Pay Your Tolls is currently used by <strong>1,130+ players</strong> on Steam. <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3800813265">Workshop page</a></p>
 
   <p class="intro">Fill in the form and the finished <strong>.con</strong> file writes itself on the right. Nothing is sent anywhere; this page runs entirely in your browser. Save the file into your mod under <strong>res/construction/asset/</strong> with the name shown, ship your model as usual, and Pay Your Tolls will find the gate, count every vehicle through it and charge the toll. <strong>No script, no dependency</strong>: without Pay Your Tolls your gate is simply a decoration.</p>
 
