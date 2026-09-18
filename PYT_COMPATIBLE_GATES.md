@@ -18,10 +18,13 @@ Ship your gate as a normal construction whose file name starts with
 `pyt_gate_`:
 
 ```
-<your mod>/res/construction/asset/pyt_gate_<anything>.con
+<your mod>/res/construction/asset/pyt_gate_<yourmod>_<gate>.con
 ```
 
-That prefix is the whole contract. Pay Your Tolls scans placed
+That prefix is the whole contract. Put YOUR MOD NAME after it, as
+shown: two modders who both ship `pyt_gate_erp_gantry.con` would be
+shipping the same path, and the game would load only one of them.
+`pyt_gate_singapore_tolls_erp_gantry.con` can never collide. Pay Your Tolls scans placed
 constructions every ten seconds and treats every `asset/pyt_gate_*.con`
 as a toll gate, exactly like its own.
 
@@ -110,7 +113,7 @@ function data()
 end
 ```
 
-Save it as `res/construction/asset/pyt_gate_my_erp_gantry.con`, ship
+Save it as `res/construction/asset/pyt_gate_mymod_erp_gantry.con`, ship
 your `.mdl`, meshes and materials as usual, and you are done. A gate
 that builds its own road works the same way; only the prefix matters.
 
