@@ -1,5 +1,10 @@
 # Making a "Pay Your Tolls compatible" toll gate
 
+> **Do not want to write the file by hand?** Use the free browser tool:
+> https://themanhun.github.io/pyt-gate-generator/ -- fill in the form,
+> download the generated `.con`, done. This page is the full contract
+> behind it.
+
 This is for Transport Fever 2 modders who want to ship their own toll
 gate models (Singapore ERP gantries, French péage plazas, anything) and
 have Pay Your Tolls count the traffic through them, charge the tolls,
