@@ -104,7 +104,7 @@
     padding: 5px 14px; margin-top: 16px;
   }
   .proof[hidden] { display: none; }
-  .proof + .proof { margin-left: 8px; }
+  .proof { margin-right: 8px; }
   .proof strong { color: var(--ink); }
   .proof a { color: var(--ink); }
 
@@ -224,6 +224,7 @@
 
   <p class="proof">Pay Your Tolls is currently used by <strong><span id="steamSubs">1,136</span> players</strong> on Steam. <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3800813265">Workshop page</a></p>
   <p class="proof" id="steamExtra" hidden><strong id="steamViews">&mdash;</strong> unique visitors &middot; <strong id="steamFavs">&mdash;</strong> favorites &middot; <strong id="steamConv">&mdash;</strong> of visitors subscribe</p>
+  <p class="proof" id="steamAge"></p>
 
   <p class="intro">Fill in the form and the finished <strong>.con</strong> file writes itself on the right. Nothing is sent anywhere; this page runs entirely in your browser. Save the file into your mod under <strong>res/construction/asset/</strong> with the name shown, ship your model as usual, and Pay Your Tolls will find the gate, count every vehicle through it and charge the toll. <strong>No script, no dependency</strong>: without Pay Your Tolls your gate is simply a decoration.</p>
 
@@ -650,6 +651,20 @@
       if (wrap) wrap.hidden = false;
     })
     .catch(() => {});
+
+  // Time since the mod was first posted on Steam (Workshop time_created,
+  // 13 Sep 2026 09:08 UTC). Static, so it works even if Supabase is down.
+  const POSTED = 1789290488 * 1000;
+  const ageEl = document.getElementById("steamAge");
+  const plural = (n, w) => n + " " + w + (n === 1 ? "" : "s");
+  const tickAge = () => {
+    const m = Math.max(0, Math.floor((Date.now() - POSTED) / 60000));
+    ageEl.innerHTML = "<strong>" + plural(Math.floor(m / 1440), "day") + " " +
+      plural(Math.floor(m / 60) % 24, "hour") + " " + plural(m % 60, "minute") +
+      "</strong> since first posted on Steam";
+  };
+  tickAge();
+  setInterval(tickAge, 30000);
 
   // Live Steam subscriber count, written by the local PYT Steam Stats Sync
   // app into pyt_steam_stats (anon has SELECT only). On any failure the
