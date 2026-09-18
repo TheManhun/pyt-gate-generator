@@ -1,0 +1,562 @@
+<title>PYT Gate Generator</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground: #f2efe8;
+    --surface: #ffffff;
+    --surface-2: #e9e5dc;
+    --ink: #1d2126;
+    --ink-2: #5a6470;
+    --line: #d5cfc3;
+    --accent: #d99a12;
+    --accent-ink: #1d2126;
+    --accent-soft: #fbefd0;
+    --ok: #2f8f57;
+    --warn: #b8730a;
+    --bad: #c23f2a;
+    --bad-soft: #f9e1dc;
+    --code-ground: #1b1f24;
+    --code-ink: #e6e1d6;
+    --code-key: #f2b53a;
+    --code-str: #9fd39a;
+    --code-cmt: #7d8794;
+    --focus: #2b6cb0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #15181c;
+      --surface: #1e2227;
+      --surface-2: #262b31;
+      --ink: #e8e4db;
+      --ink-2: #9aa3ad;
+      --line: #343a42;
+      --accent: #e8ad2b;
+      --accent-ink: #15181c;
+      --accent-soft: #3a3120;
+      --ok: #55b87c;
+      --warn: #e0a03a;
+      --bad: #e0634f;
+      --bad-soft: #3d2320;
+      --code-ground: #0f1215;
+      --code-ink: #e6e1d6;
+      --focus: #6aa7ec;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #15181c;
+    --surface: #1e2227;
+    --surface-2: #262b31;
+    --ink: #e8e4db;
+    --ink-2: #9aa3ad;
+    --line: #343a42;
+    --accent: #e8ad2b;
+    --accent-ink: #15181c;
+    --accent-soft: #3a3120;
+    --ok: #55b87c;
+    --warn: #e0a03a;
+    --bad: #e0634f;
+    --bad-soft: #3d2320;
+    --code-ground: #0f1215;
+    --code-ink: #e6e1d6;
+    --focus: #6aa7ec;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Barlow", "Segoe UI", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0;
+    padding-inline: 16px;
+    padding-block: 0 48px;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+
+  header.top {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 20px;
+    padding-block: 28px 18px;
+    border-bottom: 3px solid var(--accent);
+  }
+  header.top h1 {
+    font-family: "Barlow Condensed", "Arial Narrow", sans-serif;
+    font-weight: 700; font-size: 38px; letter-spacing: 0.01em; line-height: 1;
+    margin: 0; text-wrap: balance;
+  }
+  header.top .sub { color: var(--ink-2); font-size: 15px; }
+  header.top .mode { margin-left: auto; display: flex; gap: 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  header.top .mode button {
+    font: inherit; font-weight: 600; padding: 6px 14px; border: 0; cursor: pointer;
+    background: var(--surface); color: var(--ink-2);
+  }
+  header.top .mode button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  header.top .mode button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+
+  .intro { color: var(--ink-2); max-width: 68ch; margin-block: 16px 22px; }
+  .intro strong { color: var(--ink); }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 28px; align-items: start; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+
+  fieldset {
+    border: 1px solid var(--line); border-radius: 8px; background: var(--surface);
+    padding: 14px 16px 16px; margin: 0 0 16px;
+  }
+  legend {
+    font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-weight: 700; font-size: 19px;
+    letter-spacing: 0.02em; text-transform: uppercase; padding-inline: 6px;
+  }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; }
+  .row.one { grid-template-columns: 1fr; }
+  .row.three { grid-template-columns: 1fr 1fr 1fr; }
+  @media (max-width: 480px) { .row, .row.three { grid-template-columns: 1fr; } }
+  label.f { display: block; }
+  label.f > span, .seg > span {
+    display: block; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ink-2); margin-bottom: 4px;
+  }
+  input[type="text"], input[type="number"], select {
+    width: 100%; font: inherit; color: var(--ink); background: var(--ground);
+    border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px;
+  }
+  input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  input[aria-invalid="true"] { border-color: var(--bad); background: var(--bad-soft); }
+  .hint { font-size: 12.5px; color: var(--ink-2); margin-top: 4px; }
+  .seg .opts { display: flex; flex-wrap: wrap; gap: 6px; }
+  .seg .opts label {
+    border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer;
+    background: var(--ground); font-weight: 500; user-select: none;
+  }
+  .seg .opts input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .seg .opts label:has(input:checked) { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .seg .opts label:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .check { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+  .check input { width: 16px; height: 16px; accent-color: var(--accent); }
+  [data-adv] { display: none; }
+  body.advanced [data-adv] { display: block; }
+  body.advanced fieldset[data-adv] { display: block; }
+  .adv-note { font-size: 12.5px; color: var(--ink-2); }
+
+  /* output column */
+  .out { position: sticky; top: env(safe-area-inset-top, 0px); }
+  @media (max-width: 860px) { .out { position: static; } }
+  .filebar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px;
+    background: var(--surface-2); border: 1px solid var(--line); border-bottom: 0;
+    border-radius: 8px 8px 0 0; padding: 10px 14px;
+  }
+  .filebar .path { font-family: "JetBrains Mono", Consolas, monospace; font-size: 13px; color: var(--ink-2); }
+  .filebar .path b { color: var(--ink); font-weight: 500; }
+  .filebar .actions { margin-left: auto; display: flex; gap: 8px; }
+  .btn {
+    font: inherit; font-weight: 600; border-radius: 6px; padding: 7px 14px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  pre.code {
+    margin: 0; background: var(--code-ground); color: var(--code-ink);
+    border: 1px solid var(--line); border-radius: 0 0 8px 8px;
+    padding: 14px 16px; overflow-x: auto; font-family: "JetBrains Mono", Consolas, monospace;
+    font-size: 12.5px; line-height: 1.5; max-height: 70vh; overflow-y: auto;
+  }
+  pre.code .k { color: var(--code-key); }
+  pre.code .s { color: var(--code-str); }
+  pre.code .c { color: var(--code-cmt); font-style: italic; }
+
+  .status { display: grid; gap: 6px; margin-block: 12px 0; }
+  .msg { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); }
+  .msg::before { content: ""; flex: 0 0 10px; height: 10px; border-radius: 50%; margin-top: 5px; background: var(--ink-2); }
+  .msg.ok::before { background: var(--ok); }
+  .msg.warn::before { background: var(--warn); }
+  .msg.bad::before { background: var(--bad); }
+  .msg.bad { border-color: var(--bad); }
+  .toast { font-size: 13px; color: var(--ok); font-weight: 600; min-width: 5ch; }
+
+  .next { margin-top: 26px; border-top: 1px solid var(--line); padding-top: 16px; }
+  .next h2 { font-family: "Barlow Condensed", "Arial Narrow", sans-serif; font-size: 22px; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.02em; }
+  .next ol { margin: 0; padding-left: 20px; max-width: 70ch; }
+  .next li { margin-bottom: 6px; }
+  .next code { font-family: "JetBrains Mono", Consolas, monospace; font-size: 12.5px; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+  footer.fine { color: var(--ink-2); font-size: 12.5px; margin-top: 28px; max-width: 70ch; }
+  @media (prefers-reduced-motion: no-preference) { .toast { transition: opacity 0.3s; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>PYT Gate Generator</h1>
+    <span class="sub">Turn your toll gate model into a Pay Your Tolls compatible construction</span>
+    <div class="mode" role="group" aria-label="Mode">
+      <button type="button" id="modeSimple" aria-pressed="true">Simple</button>
+      <button type="button" id="modeAdvanced" aria-pressed="false">Advanced</button>
+    </div>
+  </header>
+
+  <p class="intro">Fill in the form and the finished <strong>.con</strong> file writes itself on the right. Nothing is sent anywhere; this page runs entirely in your browser. Save the file into your mod under <strong>res/construction/asset/</strong> with the name shown, ship your model as usual, and Pay Your Tolls will find the gate, count every vehicle through it and charge the toll. <strong>No script, no dependency</strong>: without Pay Your Tolls your gate is simply a decoration.</p>
+
+  <div class="grid">
+    <form id="form" autocomplete="off" onsubmit="return false;">
+
+      <fieldset>
+        <legend>Gate</legend>
+        <div class="row one">
+          <label class="f"><span>Gate name</span>
+            <input type="text" id="name" value="Singapore ERP Gantry" maxlength="60">
+            <div class="hint">Shown in the build menu. The file name is made from it.</div>
+          </label>
+        </div>
+        <div class="row one">
+          <label class="f"><span>Description</span>
+            <input type="text" id="desc" value="An electronic road-pricing gantry. Drop it onto a road you own. Pay Your Tolls compatible." maxlength="240">
+          </label>
+        </div>
+        <div class="row one">
+          <label class="f"><span>Model path</span>
+            <input type="text" id="model" value="my_mod/singapore_erp.mdl" spellcheck="false">
+            <div class="hint">Relative to your mod's <b>res/models/model/</b>, ending in .mdl</div>
+          </label>
+        </div>
+        <div class="row">
+          <label class="f"><span>Available from (year)</span>
+            <input type="number" id="yearFrom" value="1998" min="1800" max="2200" step="1">
+          </label>
+          <label class="f" data-adv><span>Available until (0 = never retires)</span>
+            <input type="number" id="yearTo" value="0" min="0" max="2200" step="1">
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Layout icons</legend>
+        <p class="hint" style="margin-top:0">These set the icons and label Pay Your Tolls shows for the gate in its table and click card. Counting works the same whatever you pick.</p>
+        <div class="row three">
+          <div class="seg"><span>Direction</span>
+            <div class="opts">
+              <label><input type="radio" name="ways" value="0">One way</label>
+              <label><input type="radio" name="ways" value="1" checked>Two way</label>
+            </div>
+          </div>
+          <div class="seg"><span>Lanes each way</span>
+            <div class="opts">
+              <label><input type="radio" name="lanes" value="0">1</label>
+              <label><input type="radio" name="lanes" value="1" checked>2</label>
+              <label><input type="radio" name="lanes" value="2">3</label>
+            </div>
+          </div>
+          <div class="seg"><span>Era icon</span>
+            <div class="opts">
+              <label><input type="radio" name="era" value="0">1850s</label>
+              <label><input type="radio" name="era" value="1">1920s</label>
+              <label><input type="radio" name="era" value="2">1980s</label>
+              <label><input type="radio" name="era" value="3" checked>1990s</label>
+            </div>
+          </div>
+        </div>
+        <div class="row one" data-adv style="margin-top:12px">
+          <label class="check"><input type="checkbox" id="expose" checked> Let players change direction, lanes and era in the build menu (the values above become the defaults)</label>
+          <div class="hint">With one model, the dropdowns only change the icons Pay Your Tolls shows. Uncheck to hard-wire the values and hide the dropdowns.</div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Costs</legend>
+        <div class="row three">
+          <label class="f"><span>Build cost</span><input type="number" id="cost" value="65000" min="0" step="1000"></label>
+          <label class="f"><span>Maintenance / month</span><input type="number" id="maint" value="150" min="0" step="10"></label>
+          <label class="f" data-adv><span>Bulldoze cost</span><input type="number" id="bulldoze" value="5000" min="0" step="100"></label>
+        </div>
+      </fieldset>
+
+      <fieldset data-adv>
+        <legend>Model placement</legend>
+        <p class="adv-note" style="margin-top:0">Pay Your Tolls counts vehicles in an 18 m circle around the construction's origin. If your model's origin is not on the road centreline, shift it here rather than re-exporting.</p>
+        <div class="row three">
+          <label class="f"><span>Offset X (across road, m)</span><input type="number" id="dx" value="0" step="0.1"></label>
+          <label class="f"><span>Offset Y (along road, m)</span><input type="number" id="dy" value="0" step="0.1"></label>
+          <label class="f"><span>Offset Z (height, m)</span><input type="number" id="dz" value="0" step="0.1"></label>
+        </div>
+        <div class="row three" style="margin-top:12px">
+          <label class="f"><span>Rotation Z (degrees)</span><input type="number" id="rot" value="0" step="1"></label>
+          <label class="f"><span>Scale</span><input type="number" id="scale" value="1" min="0.01" step="0.05"></label>
+          <label class="f"><span>Menu order</span><input type="number" id="order" value="1006" step="1"></label>
+        </div>
+        <div class="row one" style="margin-top:12px">
+          <label class="check"><input type="checkbox" id="snap" checked> Snap the placement ghost to nearby roads</label>
+        </div>
+      </fieldset>
+
+      <fieldset data-adv>
+        <legend>One model per layout (optional)</legend>
+        <p class="adv-note" style="margin-top:0">If your pack has a separate model for each layout, fill these in. Any blank slot falls back to the main model path above.</p>
+        <div class="row three">
+          <label class="f"><span>1 way · 1 lane</span><input type="text" id="m_0_0" spellcheck="false"></label>
+          <label class="f"><span>1 way · 2 lanes</span><input type="text" id="m_0_1" spellcheck="false"></label>
+          <label class="f"><span>1 way · 3 lanes</span><input type="text" id="m_0_2" spellcheck="false"></label>
+          <label class="f"><span>2 way · 1 lane</span><input type="text" id="m_1_0" spellcheck="false"></label>
+          <label class="f"><span>2 way · 2 lanes</span><input type="text" id="m_1_1" spellcheck="false"></label>
+          <label class="f"><span>2 way · 3 lanes</span><input type="text" id="m_1_2" spellcheck="false"></label>
+        </div>
+      </fieldset>
+    </form>
+
+    <div class="out">
+      <div class="filebar">
+        <div class="path">res/construction/asset/<b id="fileName">pyt_gate_singapore_erp_gantry.con</b></div>
+        <div class="actions">
+          <span class="toast" id="toast" aria-live="polite"></span>
+          <button type="button" class="btn" id="copyBtn">Copy code</button>
+          <button type="button" class="btn primary" id="dlBtn">Download .con</button>
+        </div>
+      </div>
+      <pre class="code" id="code" tabindex="0" aria-label="Generated construction file"></pre>
+      <div class="status" id="status"></div>
+
+      <section class="next">
+        <h2>Then, in your mod</h2>
+        <ol>
+          <li>Save the file as <code id="fileName2">pyt_gate_singapore_erp_gantry.con</code> inside <code>res/construction/asset/</code>. The <code>pyt_gate_</code> prefix is what makes it a toll gate. Never rename it after publishing: the path lives in players' saves.</li>
+          <li>Ship your .mdl, meshes, materials and textures as for any construction.</li>
+          <li>Do not list Pay Your Tolls as a dependency. Your gate works without it.</li>
+          <li>Add "Pay Your Tolls compatible" to your Workshop page. Players who have both mods will see the gate counted, named and listed in the Toll Ways table.</li>
+        </ol>
+      </section>
+    </div>
+  </div>
+
+  <footer class="fine">Contract version 1. Pay Your Tolls reads only the construction's file name prefix and its optional <code>ways</code>, <code>lanes</code> and <code>pyt_era</code> parameters. Pricing, revenue, saves, naming and the UI stay with Pay Your Tolls, so a broken pack can never damage a save.</footer>
+</div>
+
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const RESERVED = [/^epod_shared/i, /^pyt_/i, /^epod_se/i];
+  const WAYS = ["One way", "Two way"];
+  const LANES = ["1", "2", "3"];
+  const ERAS = ["1850s", "1920s", "1980s", "1990s"];
+
+  function radio(name) {
+    const el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? parseInt(el.value, 10) : 0;
+  }
+  function slug(s) {
+    return s.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 48) || "gate";
+  }
+  function luaStr(s) { return '"' + String(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"') + '"'; }
+  function num(id, fallback) { const v = parseFloat($(id).value); return isNaN(v) ? fallback : v; }
+  function fmt(n) { return Number.isInteger(n) ? n.toFixed(1) : String(n); }
+
+  function read() {
+    const advanced = document.body.classList.contains("advanced");
+    const models = {};
+    if (advanced) {
+      for (let w = 0; w < 2; w++) for (let l = 0; l < 3; l++) {
+        const v = $("m_" + w + "_" + l).value.trim();
+        if (v) models[w + "_" + l] = v;
+      }
+    }
+    return {
+      advanced,
+      name: $("name").value.trim(),
+      desc: $("desc").value.trim(),
+      model: $("model").value.trim(),
+      yearFrom: num("yearFrom", 1850),
+      yearTo: advanced ? num("yearTo", 0) : 0,
+      ways: radio("ways"), lanes: radio("lanes"), era: radio("era"),
+      expose: advanced ? $("expose").checked : true,
+      cost: num("cost", 65000), maint: num("maint", 150),
+      bulldoze: advanced ? num("bulldoze", 5000) : 5000,
+      dx: advanced ? num("dx", 0) : 0, dy: advanced ? num("dy", 0) : 0, dz: advanced ? num("dz", 0) : 0,
+      rot: advanced ? num("rot", 0) : 0, scale: advanced ? num("scale", 1) : 1,
+      order: advanced ? num("order", 1006) : 1006,
+      snap: advanced ? $("snap").checked : true,
+      models,
+    };
+  }
+
+  function validate(v) {
+    const msgs = [];
+    const bad = (t) => msgs.push({ level: "bad", t });
+    const warn = (t) => msgs.push({ level: "warn", t });
+    if (!v.name) bad("Give the gate a name. It becomes the menu label and the file name.");
+    if (!v.model) bad("The model path is empty. Enter the path to your .mdl, relative to res/models/model/.");
+    else {
+      if (!/\.mdl$/i.test(v.model)) bad("The model path must end in .mdl.");
+      if (/^[\/\\]|^res\//i.test(v.model)) bad("Model paths are relative to res/models/model/. Drop the leading slash or res/ prefix.");
+      if (RESERVED.some((r) => r.test(v.model.split("/").pop()))) warn("That model name looks like one of Pay Your Tolls' own. Use your own model files; borrowing theirs means your gate vanishes if Pay Your Tolls is uninstalled.");
+    }
+    Object.values(v.models).forEach((m) => { if (!/\.mdl$/i.test(m)) bad("Every per-layout model path must end in .mdl (" + m + ")."); });
+    if (v.yearFrom < 1800 || v.yearFrom > 2200) bad("Available-from year must be between 1800 and 2200.");
+    if (v.yearTo !== 0 && v.yearTo <= v.yearFrom) bad("Available-until must be later than available-from, or 0 for never.");
+    if (v.cost < 0 || v.maint < 0 || v.bulldoze < 0) bad("Costs cannot be negative.");
+    if (v.scale <= 0) bad("Scale must be greater than zero.");
+    if (v.era === 0 && v.yearFrom >= 1980) warn("An 1850s era icon on a gate available from " + v.yearFrom + " will look odd in the table. Fine if that is the look you want.");
+    if (v.era === 3 && v.yearFrom < 1950) warn("A 1990s era icon on a gate available from " + v.yearFrom + " will look odd in the table.");
+    if (Math.abs(v.dx) > 9 || Math.abs(v.dy) > 9) warn("A large offset moves the model away from the construction origin, but Pay Your Tolls still counts around the origin. Keep the origin on the road centreline.");
+    if (!msgs.some((m) => m.level === "bad")) msgs.unshift({ level: "ok", t: "Ready. Pay Your Tolls will recognise this file by its name and count traffic in an 18 m circle around where you place it." });
+    return msgs;
+  }
+
+  function generate(v) {
+    const file = "pyt_gate_" + slug(v.name) + ".con";
+    const L = [];
+    L.push("-- " + file);
+    L.push("-- Generated by the PYT Gate Generator for " + luaStr(v.name).slice(1, -1) + ".");
+    L.push("-- Pay Your Tolls compatible: the pyt_gate_ file-name prefix is the whole contract.");
+    L.push("-- Without Pay Your Tolls this is an ordinary decorative construction.");
+    L.push("-- Keep the construction origin on the road centreline: traffic is counted");
+    L.push("-- in an 18 m circle around it.");
+    L.push("");
+    L.push('local transf = require "transf"');
+    L.push('local vec3 = require "vec3"');
+    L.push("");
+    L.push("function data()");
+    L.push("    return {");
+    L.push('        type = "STREET_CONSTRUCTION",');
+    L.push("        description = {");
+    L.push("            name = _(" + luaStr(v.name) + "),");
+    L.push("            description = _(" + luaStr(v.desc || v.name) + "),");
+    L.push("        },");
+    L.push("        availability = { yearFrom = " + Math.round(v.yearFrom) + ", yearTo = " + Math.round(v.yearTo) + " },");
+    L.push('        buildMode = "SINGLE",');
+    L.push("        skipCollision = true, -- sits over an existing street");
+    if (v.snap) L.push("        snapping = { road = true }, -- placement ghost snaps to the road");
+    L.push("        order = " + Math.round(v.order) + ",");
+    L.push("        autoRemovable = false,");
+    L.push("");
+    if (v.expose) {
+      L.push("        -- Pay Your Tolls reads these three by key. They set the icons and label it shows.");
+      L.push("        params = {");
+      L.push('            { key = "ways", name = _("Direction"), uiType = "COMBOBOX",');
+      L.push("              values = { " + WAYS.map((s) => "_(" + luaStr(s) + ")").join(", ") + " }, defaultIndex = " + v.ways + " },");
+      L.push('            { key = "lanes", name = _("Lanes each way"), uiType = "COMBOBOX",');
+      L.push("              values = { " + LANES.map((s) => "_(" + luaStr(s) + ")").join(", ") + " }, defaultIndex = " + v.lanes + " },");
+      L.push('            { key = "pyt_era", name = _("Era icon"), uiType = "COMBOBOX",');
+      L.push("              values = { " + ERAS.map((s) => "_(" + luaStr(s) + ")").join(", ") + " }, defaultIndex = " + v.era + " },");
+      L.push("        },");
+    } else {
+      L.push("        -- Fixed layout (" + WAYS[v.ways] + ", " + LANES[v.lanes] + " lane(s) each way, " + ERAS[v.era] + " icon):");
+      L.push("        -- single-option dropdowns so Pay Your Tolls still reads the values by key.");
+      L.push("        params = {");
+      L.push('            { key = "ways", name = _("Direction"), uiType = "COMBOBOX", values = { ' + Array(v.ways + 1).fill(0).map((_, i) => "_(" + luaStr(WAYS[i]) + ")").join(", ") + " }, defaultIndex = " + v.ways + " },");
+      L.push('            { key = "lanes", name = _("Lanes each way"), uiType = "COMBOBOX", values = { ' + Array(v.lanes + 1).fill(0).map((_, i) => "_(" + luaStr(LANES[i]) + ")").join(", ") + " }, defaultIndex = " + v.lanes + " },");
+      L.push('            { key = "pyt_era", name = _("Era icon"), uiType = "COMBOBOX", values = { ' + Array(v.era + 1).fill(0).map((_, i) => "_(" + luaStr(ERAS[i]) + ")").join(", ") + " }, defaultIndex = " + v.era + " },");
+      L.push("        },");
+    }
+    L.push("");
+    L.push("        updateFn = function(params)");
+    L.push("            local result = {}");
+    L.push("            result.edgeLists = {} -- no road of its own");
+    L.push("            result.terrainAlignmentLists = {} -- pure overlay on the existing road");
+    L.push("");
+    const perLayout = Object.keys(v.models).length > 0;
+    if (perLayout) {
+      L.push("            -- one model per layout; blanks fall back to the main model");
+      L.push("            local MODELS = {");
+      for (let w = 0; w < 2; w++) {
+        L.push("                [" + w + "] = { " + [0, 1, 2].map((l) => "[" + l + "] = " + luaStr(v.models[w + "_" + l] || v.model)).join(", ") + " },");
+      }
+      L.push("            }");
+      L.push("            local ways = params.ways or " + v.ways);
+      L.push("            local lanes = params.lanes or " + v.lanes);
+      L.push("            if ways < 0 then ways = 0 elseif ways > 1 then ways = 1 end");
+      L.push("            if lanes < 0 then lanes = 0 elseif lanes > 2 then lanes = 2 end");
+      L.push("            local modelId = MODELS[ways][lanes]");
+    } else {
+      L.push("            local modelId = " + luaStr(v.model));
+    }
+    L.push("");
+    L.push("            result.models = {");
+    L.push("                {");
+    L.push("                    id = modelId,");
+    L.push("                    transf = transf.scaleRotZYXTransl(");
+    L.push("                        vec3.new(" + fmt(v.scale) + ", " + fmt(v.scale) + ", " + fmt(v.scale) + "),");
+    L.push("                        transf.degToRad(" + fmt(v.rot) + ", 0.0, 0.0),");
+    L.push("                        vec3.new(" + fmt(v.dx) + ", " + fmt(v.dy) + ", " + fmt(v.dz) + ")");
+    L.push("                    ),");
+    L.push("                },");
+    L.push("            }");
+    L.push("");
+    L.push("            result.cost = " + Math.round(v.cost));
+    L.push("            result.bulldozeCost = " + Math.round(v.bulldoze));
+    L.push("            result.maintenanceCost = " + Math.round(v.maint));
+    L.push("            return result");
+    L.push("        end,");
+    L.push("    }");
+    L.push("end");
+    L.push("");
+    return { file, code: L.join("\n") };
+  }
+
+  function highlight(code) {
+    const esc = code.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    return esc.split("\n").map((line) => {
+      const i = line.indexOf("--");
+      let body = line, cmt = "";
+      if (i >= 0 && !/"[^"]*--[^"]*"/.test(line)) { body = line.slice(0, i); cmt = line.slice(i); }
+      body = body.replace(/"(?:[^"\\]|\\.)*"/g, (m) => '<span class="s">' + m + "</span>");
+      body = body.replace(/\b(local|function|return|end|if|then|elseif|else|or|and)\b/g, '<span class="k">$1</span>');
+      return body + (cmt ? '<span class="c">' + cmt + "</span>" : "");
+    }).join("\n");
+  }
+
+  let current = { file: "", code: "" };
+  function render() {
+    const v = read();
+    const msgs = validate(v);
+    current = generate(v);
+    $("fileName").textContent = current.file;
+    $("fileName2").textContent = current.file;
+    $("code").innerHTML = highlight(current.code);
+    const status = $("status");
+    status.innerHTML = "";
+    msgs.forEach((m) => { const d = document.createElement("div"); d.className = "msg " + m.level; d.textContent = m.t; status.appendChild(d); });
+    const blocked = msgs.some((m) => m.level === "bad");
+    $("copyBtn").disabled = blocked; $("dlBtn").disabled = blocked;
+    $("model").setAttribute("aria-invalid", (!v.model || !/\.mdl$/i.test(v.model)) ? "true" : "false");
+    $("name").setAttribute("aria-invalid", v.name ? "false" : "true");
+  }
+
+  function toast(text) {
+    const t = $("toast"); t.textContent = text; t.style.opacity = "1";
+    setTimeout(() => { t.style.opacity = "0"; }, 1800);
+  }
+
+  $("copyBtn").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(current.code); toast("Copied"); }
+    catch (e) {
+      const r = document.createRange(); r.selectNodeContents($("code"));
+      const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      toast("Select all and copy");
+    }
+  });
+  $("dlBtn").addEventListener("click", () => {
+    try {
+      const blob = new Blob([current.code], { type: "text/plain" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = current.file;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      toast("Saved");
+    } catch (e) { toast("Use Copy code"); }
+  });
+
+  function setMode(adv) {
+    document.body.classList.toggle("advanced", adv);
+    $("modeSimple").setAttribute("aria-pressed", adv ? "false" : "true");
+    $("modeAdvanced").setAttribute("aria-pressed", adv ? "true" : "false");
+    try { localStorage.setItem("pytgen.mode", adv ? "advanced" : "simple"); } catch (e) {}
+    render();
+  }
+  $("modeSimple").addEventListener("click", () => setMode(false));
+  $("modeAdvanced").addEventListener("click", () => setMode(true));
+  $("form").addEventListener("input", render);
+  $("form").addEventListener("change", render);
+
+  let startAdvanced = false;
+  try { startAdvanced = localStorage.getItem("pytgen.mode") === "advanced"; } catch (e) {}
+  setMode(startAdvanced);
+})();
+</script>
