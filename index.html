@@ -204,6 +204,13 @@
   .next ol { margin: 0; padding-left: 20px; max-width: 70ch; }
   .next li { margin-bottom: 6px; }
   .next code { font-family: "JetBrains Mono", Consolas, monospace; font-size: 12.5px; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+  .feature { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line, currentColor); max-width: 70ch; }
+  .feature h3 { margin: 0 0 6px; font-size: 15px; }
+  .feature p { margin: 0; color: var(--ink-2); }
+  .video { max-width: 640px; margin: 0 0 20px; }
+  .video .frame { position: relative; aspect-ratio: 16 / 9; max-width: 100%; }
+  .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .video p { margin: 6px 0 0; font-size: 12.5px; color: var(--ink-2); }
   footer.fine { color: var(--ink-2); font-size: 12.5px; margin-top: 28px; max-width: 70ch; }
   footer.fine p { margin: 0 0 8px; }
   footer.fine a { color: var(--ink); }
@@ -227,6 +234,11 @@
   <p class="proof" id="steamAge"></p>
 
   <p class="intro">Fill in the form and the finished <strong>.con</strong> file writes itself on the right. Nothing is sent anywhere; this page runs entirely in your browser. Save the file into your mod under <strong>res/construction/asset/</strong> with the name shown, ship your model as usual, and Pay Your Tolls will find the gate, count every vehicle through it and charge the toll. <strong>No script, no dependency</strong>: without Pay Your Tolls your gate is simply a decoration.</p>
+
+  <div class="video">
+    <div class="frame"><iframe src="https://www.youtube-nocookie.com/embed/qRXZ5o7VFuc" title="Pay Your Tolls video" loading="lazy" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+    <p>Pay Your Tolls in action. <a href="https://www.youtube.com/watch?v=qRXZ5o7VFuc">Watch on YouTube</a></p>
+  </div>
 
   <div class="grid">
     <form id="form" autocomplete="off" onsubmit="return false;">
@@ -361,6 +373,10 @@
           <li>Do not list Pay Your Tolls as a dependency. Your gate works without it.</li>
           <li>Add "Pay Your Tolls compatible" to your Workshop page with a link back here or to the Pay Your Tolls Workshop page. That credit is the only thing the licence asks for. Players who have both mods will see the gate counted, named and listed in the Toll Ways table.</li>
         </ol>
+        <div class="feature">
+          <h3>Get featured on the Pay Your Tolls Workshop page</h3>
+          <p>If you use this generator to make your toll gate compatible, let me know! Leave a comment on the <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3800813265">Pay Your Tolls Workshop page</a> or ping me on Discord (Epod). I will gladly feature your mod and link directly to it on the main Pay Your Tolls page, so the players who use Pay Your Tolls can find and download your custom booths.</p>
+        </div>
       </section>
     </div>
   </div>
