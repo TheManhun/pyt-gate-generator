@@ -378,6 +378,10 @@
           <h3>Get featured on the Pay Your Tolls Workshop page</h3>
           <p>If you use this generator to make your toll gate compatible, let me know! Leave a comment on the <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3800813265">Pay Your Tolls Workshop page</a> or ping me on Discord (man_hun). I will gladly feature your mod and link directly to it on the main Pay Your Tolls page, so the players who use Pay Your Tolls can find and download your custom booths.</p>
         </div>
+        <div class="feature" id="modsUsingFormat" hidden>
+          <h3>Mods already using this format</h3>
+          <ul id="modsList" style="margin:0; padding-left:18px;"></ul>
+        </div>
       </section>
     </div>
   </div>
@@ -677,11 +681,10 @@
   sb.rpc("get_pyt_stats")
     .then(({ data, error }) => {
       if (error || !data || typeof data.unique_visitors !== "number") return;
-      // scripts_generated/live_mods_using_format may not exist yet on
-      // the live function (added after the visit counter -- see
-      // supabase_setup.sql) -- each field falls back to an em dash
-      // rather than hiding the whole line, so the chart still shows
-      // real visitor numbers even before that SQL is applied.
+      // scripts_generated/live_mods_using_format/mods each fall back
+      // gracefully (an em dash, or the mods card staying hidden)
+      // rather than breaking the whole line if the live function ever
+      // falls behind supabase_setup.sql again.
       document.getElementById("pytVisitors").textContent = data.unique_visitors.toLocaleString();
       if (typeof data.scripts_generated === "number") {
         document.getElementById("pytGenerated").textContent = data.scripts_generated.toLocaleString();
@@ -691,6 +694,36 @@
         document.getElementById("pytLiveModsWord").textContent = data.live_mods_using_format === 1 ? "live mod" : "live mods";
       }
       document.getElementById("pytStats").hidden = false;
+
+      // The actual mods (name/url/note/author), same live_mods_using_format
+      // count as above but with real detail -- shown as social proof next
+      // to the "get featured" pitch, not just the number at the top.
+      if (Array.isArray(data.mods) && data.mods.length > 0) {
+        const list = document.getElementById("modsList");
+        data.mods.forEach((mod) => {
+          if (!mod || typeof mod.name !== "string" || typeof mod.url !== "string") return;
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          a.href = mod.url;
+          a.textContent = mod.name;
+          a.rel = "noopener";
+          li.appendChild(a);
+          if (typeof mod.author === "string" && mod.author) {
+            li.appendChild(document.createTextNode(" by " + mod.author));
+          }
+          if (typeof mod.note === "string" && mod.note) {
+            const note = document.createElement("div");
+            note.className = "hint";
+            note.style.marginTop = "0";
+            note.textContent = mod.note;
+            li.appendChild(note);
+          }
+          list.appendChild(li);
+        });
+        if (list.childElementCount > 0) {
+          document.getElementById("modsUsingFormat").hidden = false;
+        }
+      }
     })
     .catch(() => {});
 
