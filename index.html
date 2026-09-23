@@ -232,6 +232,7 @@
   <p class="proof">Pay Your Tolls is currently used by <strong><span id="steamSubs">1,136</span> players</strong> on Steam. <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3800813265">Workshop page</a></p>
   <p class="proof" id="steamExtra" hidden><strong id="steamViews">&mdash;</strong> unique visitors &middot; <strong id="steamFavs">&mdash;</strong> favorites &middot; <strong id="steamConv">&mdash;</strong> of visitors subscribe</p>
   <p class="proof" id="steamAge"></p>
+  <p class="proof" id="pytStats" hidden><strong id="pytVisitors">&mdash;</strong> modders visited &middot; <strong id="pytGenerated">&mdash;</strong> gate scripts generated &middot; <strong id="pytLiveMods">&mdash;</strong> <span id="pytLiveModsWord">live mods</span> using the format</p>
 
   <p class="intro">Fill in the form and the finished <strong>.con</strong> file writes itself on the right. Nothing is sent anywhere; this page runs entirely in your browser. Save the file into your mod under <strong>res/construction/asset/</strong> with the name shown, ship your model as usual, and Pay Your Tolls will find the gate, count every vehicle through it and charge the toll. <strong>No script, no dependency</strong>: without Pay Your Tolls your gate is simply a decoration.</p>
 
@@ -384,7 +385,6 @@
   <footer class="fine">
     <p>Contract version 1. Pay Your Tolls reads only the construction's file name prefix and its optional <code>ways</code>, <code>lanes</code> and <code>pyt_era</code> parameters. Pricing, revenue, saves, naming and the UI stay with Pay Your Tolls, so a broken pack can never damage a save.</p>
     <p><strong>Licence.</strong> The compatibility system, this generator and everything it produces are free to use and modify in any Transport Fever 2 mod, provided you credit "Pay Your Tolls" with a link to its <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3800813265">Workshop page</a> or this page, and do not present the system as your own. Your own models and assets stay yours. No dependency on Pay Your Tolls is required or expected. Full text: <a href="LICENSE.txt">PYT Compatibility Licence v1</a>.</p>
-    <p id="visitCounter" hidden>Visited by <strong id="visitCount">&mdash;</strong> modders so far.</p>
   </footer>
 </div>
 
@@ -658,13 +658,39 @@
     .then(() => {})
     .catch(() => {});
 
+  // Counts a real "script generated" event -- Copy code or Download,
+  // never the live preview's own render() (that fires on every
+  // keystroke and would be pure noise). Fire-and-forget, same as the
+  // visit insert above; a failed insert never blocks the actual
+  // copy/download the modder is doing.
+  const trackGeneration = () => {
+    sb.from("pyt_generator_generations")
+      .insert({ session_id: sessionId })
+      .then(() => {})
+      .catch(() => {});
+  };
+  const copyBtn = document.getElementById("copyBtn");
+  const dlBtn = document.getElementById("dlBtn");
+  if (copyBtn) copyBtn.addEventListener("click", trackGeneration);
+  if (dlBtn) dlBtn.addEventListener("click", trackGeneration);
+
   sb.rpc("get_pyt_stats")
     .then(({ data, error }) => {
       if (error || !data || typeof data.unique_visitors !== "number") return;
-      const el = document.getElementById("visitCount");
-      const wrap = document.getElementById("visitCounter");
-      if (el) el.textContent = data.unique_visitors.toLocaleString();
-      if (wrap) wrap.hidden = false;
+      // scripts_generated/live_mods_using_format may not exist yet on
+      // the live function (added after the visit counter -- see
+      // supabase_setup.sql) -- each field falls back to an em dash
+      // rather than hiding the whole line, so the chart still shows
+      // real visitor numbers even before that SQL is applied.
+      document.getElementById("pytVisitors").textContent = data.unique_visitors.toLocaleString();
+      if (typeof data.scripts_generated === "number") {
+        document.getElementById("pytGenerated").textContent = data.scripts_generated.toLocaleString();
+      }
+      if (typeof data.live_mods_using_format === "number") {
+        document.getElementById("pytLiveMods").textContent = data.live_mods_using_format.toLocaleString();
+        document.getElementById("pytLiveModsWord").textContent = data.live_mods_using_format === 1 ? "live mod" : "live mods";
+      }
+      document.getElementById("pytStats").hidden = false;
     })
     .catch(() => {});
 
