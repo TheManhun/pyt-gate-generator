@@ -215,6 +215,19 @@
   footer.fine p { margin: 0 0 8px; }
   footer.fine a { color: var(--ink); }
   @media (prefers-reduced-motion: no-preference) { .toast { transition: opacity 0.3s; } }
+
+  /* TF2 / TF3 switch */
+  header.top .game { margin-left: auto; }
+  header.top .game + .mode { margin-left: 0; }
+  body[data-game="tf3"] .only-tf2 { display: none !important; }
+  body:not([data-game="tf3"]) .only-tf3 { display: none !important; }
+  .tabs { display: flex; flex-wrap: wrap; border: 1px solid var(--line); border-bottom: 0; border-radius: 8px 8px 0 0; overflow: hidden; background: var(--surface-2); }
+  .tabs button { font-family: "JetBrains Mono", Consolas, monospace; font-weight: 500; font-size: 12.5px; padding: 8px 14px; border: 0; border-right: 1px solid var(--line); cursor: pointer; background: transparent; color: var(--ink-2); }
+  .tabs button[aria-selected="true"] { background: var(--code-ground); color: var(--code-ink); }
+  .tabs button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+  .filebar.tf3-bar { border-radius: 0; }
+  pre.code { tab-size: 4; -moz-tab-size: 4; }
+  .only-tf3 .intro a, .only-tf3 .next a, .only-tf3 footer a { color: var(--ink); }
 </style>
 
 </head>
@@ -223,6 +236,10 @@
   <header class="top">
     <h1>PYT Gate Generator</h1>
     <span class="sub">Turn your toll gate model into a Pay Your Tolls compatible construction</span>
+    <div class="mode game" role="group" aria-label="Game">
+      <button type="button" id="gameTf2" aria-pressed="true">TF2</button>
+      <button type="button" id="gameTf3" aria-pressed="false">TF3</button>
+    </div>
     <div class="mode" role="group" aria-label="Mode">
       <button type="button" id="modeSimple" aria-pressed="true">Simple</button>
       <button type="button" id="modeAdvanced" aria-pressed="false">Advanced</button>
@@ -234,6 +251,7 @@
   <p class="proof" id="steamAge"></p>
   <p class="proof" id="pytStats" hidden><strong id="pytVisitors">&mdash;</strong> modders visited &middot; <strong id="pytGenerated">&mdash;</strong> gate scripts generated &middot; <strong id="pytLiveMods">&mdash;</strong> <span id="pytLiveModsWord">live mods</span> using the format</p>
 
+  <div class="only-tf2">
   <p class="intro">Fill in the form and the finished <strong>.con</strong> file writes itself on the right. Nothing is sent anywhere; this page runs entirely in your browser. Save the file into your mod under <strong>res/construction/asset/</strong> with the name shown, ship your model as usual, and Pay Your Tolls will find the gate, count every vehicle through it and charge the toll. <strong>No script, no dependency</strong>: without Pay Your Tolls your gate is simply a decoration.</p>
 
   <div class="video">
@@ -390,6 +408,132 @@
     <p>Contract version 1. Pay Your Tolls reads only the construction's file name prefix and its optional <code>ways</code>, <code>lanes</code> and <code>pyt_era</code> parameters. Pricing, revenue, saves, naming and the UI stay with Pay Your Tolls, so a broken pack can never damage a save.</p>
     <p><strong>Licence.</strong> The compatibility system, this generator and everything it produces are free to use and modify in any Transport Fever 2 mod, provided you credit "Pay Your Tolls" with a link to its <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3800813265">Workshop page</a> or this page, and do not present the system as your own. Your own models and assets stay yours. No dependency on Pay Your Tolls is required or expected. Full text: <a href="LICENSE.txt">PYT Compatibility Licence v1</a>.</p>
   </footer>
+  </div>
+
+  <!-- ===================== TRANSPORT FEVER 3 ===================== -->
+  <div class="only-tf3">
+  <p class="intro">Pay Your Tolls for <strong>Transport Fever 3</strong> (<a href="https://mod.io/g/transportfever3/m/pay-your-tolls">on mod.io</a>) finds toll gates by their <strong>model's file name</strong>: any placed model whose file name starts with <strong>pyt_gate_</strong> becomes a toll, counted in an 18 m circle around the model's origin. Fill in the form and three files write themselves on the right: a build-menu entry (<strong>.con.lua</strong>), a small placement script (<strong>.script.lua</strong>) and the lines for your <strong>_content.json</strong>. Nothing is sent anywhere. <strong>No dependency</strong>: without Pay Your Tolls your gate is simply a decoration.</p>
+
+  <div class="grid">
+    <form id="form3" autocomplete="off" onsubmit="return false;">
+      <fieldset>
+        <legend>Your mod</legend>
+        <div class="row">
+          <label class="f"><span>Mod ID</span>
+            <input type="text" id="t3modid" value="my_toll_gates_1" maxlength="60" spellcheck="false">
+            <div class="hint">Exactly as <b>modId</b> in your mod.json, e.g. <b>my_toll_gates_1</b>. Lower case.</div>
+          </label>
+          <label class="f"><span>Folder in content/</span>
+            <input type="text" id="t3folder" value="my_gates" maxlength="60" spellcheck="false">
+            <div class="hint">The folder under your mod's <b>content/</b> holding the gate files. Lower case.</div>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Gate</legend>
+        <div class="row">
+          <label class="f"><span>Gate name</span>
+            <input type="text" id="t3name" value="Your Gate Name" maxlength="60">
+            <div class="hint">Shown in the build menu (road menu &gt; Road Constructions).</div>
+          </label>
+          <label class="f"><span>Available from (year)</span>
+            <input type="number" id="t3year" value="1980" min="0" max="2200" step="1">
+          </label>
+        </div>
+        <div class="row one">
+          <label class="f"><span>Description</span>
+            <input type="text" id="t3desc" value="A toll gate -- place it across a matching road (it doesn't snap). Pay Your Tolls compatible." maxlength="240">
+          </label>
+        </div>
+        <div class="row one">
+          <label class="f"><span>Model file</span>
+            <input type="text" id="t3model" value="pyt_gate_my_gate.mdl" spellcheck="false">
+            <div class="hint">The .mdl in the same folder. Its name <b>must start with pyt_gate_</b> -- that is what Pay Your Tolls looks for. Lower case.</div>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Costs</legend>
+        <div class="row">
+          <label class="f"><span>Build cost</span><input type="number" id="t3cost" value="50000" min="0" step="1000">
+            <div class="hint">TF3 scales it with the era, like its own buildings.</div></label>
+          <label class="f"><span>Maintenance / year</span><input type="number" id="t3maint" value="1" min="0" step="1">
+            <div class="hint">Not 0: TF3 treats 0 as "not set" and charges a sixth of the price every year.</div></label>
+        </div>
+      </fieldset>
+
+      <fieldset data-adv>
+        <legend>One model per layout (optional)</legend>
+        <p class="adv-note" style="margin-top:0">Fill these in to give your entry <b>Direction</b> and <b>Lanes</b> choices, like Pay Your Tolls' own Toll Gantry; the script places the matching model. Blank slots use the main model. Every file name must start with pyt_gate_.</p>
+        <div class="row three">
+          <label class="f"><span>1 way &middot; 1 lane</span><input type="text" id="t3m_1_1" spellcheck="false"></label>
+          <label class="f"><span>1 way &middot; 2 lanes</span><input type="text" id="t3m_1_2" spellcheck="false"></label>
+          <label class="f"><span>1 way &middot; 3 lanes</span><input type="text" id="t3m_1_3" spellcheck="false"></label>
+          <label class="f"><span>2 way &middot; 1 lane</span><input type="text" id="t3m_2_1" spellcheck="false"></label>
+          <label class="f"><span>2 way &middot; 2 lanes</span><input type="text" id="t3m_2_2" spellcheck="false"></label>
+          <label class="f"><span>2 way &middot; 3 lanes</span><input type="text" id="t3m_2_3" spellcheck="false"></label>
+        </div>
+      </fieldset>
+
+      <fieldset data-adv>
+        <legend>Model placement</legend>
+        <p class="adv-note" style="margin-top:0">Pay Your Tolls counts traffic 18 m around the model's origin. If the origin isn't on the road centreline, shift the model here.</p>
+        <div class="row three">
+          <label class="f"><span>Offset X (m)</span><input type="number" id="t3dx" value="0" step="0.1"></label>
+          <label class="f"><span>Offset Y (m)</span><input type="number" id="t3dy" value="0" step="0.1"></label>
+          <label class="f"><span>Offset Z (m)</span><input type="number" id="t3dz" value="0" step="0.1"></label>
+        </div>
+        <div class="row three" style="margin-top:12px">
+          <label class="f"><span>Rotation Z (degrees)</span><input type="number" id="t3rot" value="0" step="1"></label>
+          <label class="f"><span>Scale</span><input type="number" id="t3scale" value="1" min="0.01" step="0.05"></label>
+          <label class="f"><span>Menu order</span><input type="number" id="t3order" value="9100" step="1"></label>
+        </div>
+      </fieldset>
+    </form>
+
+    <div class="out">
+      <div class="tabs" role="tablist" aria-label="Generated files">
+        <button type="button" role="tab" id="t3tab0" aria-selected="true"></button>
+        <button type="button" role="tab" id="t3tab1" aria-selected="false"></button>
+        <button type="button" role="tab" id="t3tab2" aria-selected="false">_content.json</button>
+      </div>
+      <div class="filebar tf3-bar">
+        <div class="path" id="t3path"></div>
+        <div class="actions">
+          <span class="toast" id="t3toast" aria-live="polite"></span>
+          <button type="button" class="btn" id="t3copyBtn">Copy</button>
+          <button type="button" class="btn primary" id="t3dlBtn">Download</button>
+        </div>
+        <div class="badges">
+          <div class="badge ok"><b>PYT TF3 compatible</b><span>model file name starts with pyt_gate_</span></div>
+          <div class="badge rule"><b>Detection centre</b><span>the model's origin, 18 m radius</span></div>
+        </div>
+      </div>
+      <pre class="code" id="t3code" tabindex="0" aria-label="Generated file"></pre>
+      <div class="status" id="t3status"></div>
+
+      <section class="next">
+        <h2>Then, in your mod</h2>
+        <ol>
+          <li>Save the <b>.con.lua</b> and <b>.script.lua</b> into <code>content/<span class="t3folderOut">my_gates</span>/</code>, next to your model.</li>
+          <li>Add the lines from the <b>_content.json</b> tab to the <code>"files"</code> list in your mod's <code>_content.json</code>. TF3 only loads listed files, so your model's meshes, materials and textures must be listed too.</li>
+          <li>In your .mdl, set the collider to <code>type = "NONE"</code> so the gate can stand over a road. TF3's Model Editor resets it to a box on every save.</li>
+          <li>Give the entry pictures: <code><span class="t3slugOut">gate</span>@2x.tga</code> (menu icon, 240 x 150) and <code><span class="t3slugOut">gate</span>_preview@2x.tga</code> (720 x 405) in the same folder. Without a preview the info box shows plain blue.</li>
+          <li>Keep every file and folder name lower case (TF3's upload validator warns on capitals), and never rename the model after release: placed gates are saved by model.</li>
+          <li>Say "Pay Your Tolls compatible" on your mod page with a link to <a href="https://mod.io/g/transportfever3/m/pay-your-tolls">Pay Your Tolls on mod.io</a> or this page. That credit is all the licence asks for.</li>
+        </ol>
+      </section>
+    </div>
+  </div>
+
+  <footer class="fine">
+    <p>TF3 contract version 1. Pay Your Tolls (TF3) reads only the placed <b>model's file name</b> (it must contain <code>pyt_gate_</code>) and its position. Prices, revenue, saves, naming and the toll window stay with Pay Your Tolls. Each vehicle pays once per 20 seconds, at whichever toll it reaches first, so a gate beside another earns nothing extra. Construction choices arrive <b>1-based</b> in TF3; the generated script handles it.</p>
+    <p><strong>Licence.</strong> The PYT Compatibility Licence v1 applies to Transport Fever 3 mods too: free to use and modify with credit to "Pay Your Tolls" and a link to <a href="https://mod.io/g/transportfever3/m/pay-your-tolls">its mod.io page</a> or this page. Your own models stay yours. Full text: <a href="LICENSE.txt">PYT Compatibility Licence v1</a>.</p>
+  </footer>
+  </div>
+
 </div>
 
 <script>
@@ -631,6 +775,277 @@
 })();
 </script>
 
+<script>
+// ===================== Transport Fever 3 generator =====================
+// Pay Your Tolls (TF3) finds a toll by the placed MODEL's file name (pyt_gate_...), not by the construction.
+// This writes a build entry (.con.lua), a self-contained placement script (.script.lua) and the _content.json
+// lines. TF3 facts it encodes (Pay Your Tolls TF3 decisions): construction choices arrive 1-based; a model-only
+// construction is placed as a decoration; maintenance 0 is treated as unset (cost / 6 a year); file names should
+// be lower case; the build menu category for roads is "street_constructions" (shown as "Road Constructions").
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const OWN = [/^pyt_gate_core_gantry\.mdl$/, /^pyt_gate_toll_sign\.mdl$/, /^pyt_gate_[12]w[123]l_1980\.mdl$/, /^pyt_toll_sign\.mdl$/];
+  const LAYOUTS = [[1, 1], [1, 2], [1, 3], [2, 1], [2, 2], [2, 3]];
+
+  function slug(s) {
+    return String(s).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 48) || "gate";
+  }
+  function luaStr(s) { return '"' + String(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"') + '"'; }
+  function num(id, fallback) { const v = parseFloat($(id).value); return isNaN(v) ? fallback : v; }
+  function r6(n) { const v = Math.round(n * 1e6) / 1e6; return Object.is(v, -0) ? "0" : String(v); }
+
+  function read() {
+    const advanced = document.body.classList.contains("advanced");
+    const models = {};
+    if (advanced) LAYOUTS.forEach(([w, l]) => {
+      const v = $("t3m_" + w + "_" + l).value.trim();
+      if (v) models[w + "_" + l] = v;
+    });
+    return {
+      advanced,
+      modid: $("t3modid").value.trim(),
+      folder: $("t3folder").value.trim(),
+      name: $("t3name").value.trim(),
+      desc: $("t3desc").value.trim(),
+      model: $("t3model").value.trim(),
+      year: num("t3year", 0),
+      cost: num("t3cost", 50000),
+      maint: num("t3maint", 1),
+      dx: advanced ? num("t3dx", 0) : 0, dy: advanced ? num("t3dy", 0) : 0, dz: advanced ? num("t3dz", 0) : 0,
+      rot: advanced ? num("t3rot", 0) : 0, scale: advanced ? num("t3scale", 1) : 1,
+      order: advanced ? num("t3order", 9100) : 9100,
+      models,
+    };
+  }
+
+  function checkModel(m, where, bad) {
+    if (!/\.mdl$/.test(m)) bad(where + " must end in .mdl (" + m + ").");
+    else if (/[A-Z]/.test(m)) bad(where + " must be lower case (" + m + "). TF3's validator warns on capitals, and case-sensitive systems (consoles) may not find it.");
+    else if (!/^pyt_gate_[a-z0-9_]+\.mdl$/.test(m)) bad(where + " must be a file name starting with pyt_gate_ (letters, digits and _ only), e.g. pyt_gate_my_gate.mdl. That prefix is what Pay Your Tolls looks for.");
+    else if (OWN.some((r) => r.test(m))) bad(where + " uses one of Pay Your Tolls' own model names (" + m + "). Name your model after your own mod.");
+  }
+
+  function validate(v) {
+    const msgs = [];
+    const bad = (t) => msgs.push({ level: "bad", t });
+    const warn = (t) => msgs.push({ level: "warn", t });
+    if (!v.modid) bad("Enter your mod ID, exactly as modId in your mod.json.");
+    else if (!/^[a-z0-9_]+$/.test(v.modid)) bad("The mod ID may only use lower-case letters, digits and _ (it must match your mod.json).");
+    else if (!/_\d+$/.test(v.modid)) warn("TF3 mod IDs usually end in a number, like my_toll_gates_1. Check it matches your mod.json exactly.");
+    if (!v.folder) bad("Enter the folder under content/ that holds the gate.");
+    else if (!/^[a-z0-9_]+$/.test(v.folder)) bad("The folder name may only use lower-case letters, digits and _.");
+    if (!v.name) bad("Give the gate a name. It is shown in the build menu.");
+    if (!v.model) bad("Enter your model's file name, e.g. pyt_gate_my_gate.mdl.");
+    else checkModel(v.model, "The model file", bad);
+    Object.entries(v.models).forEach(([k, m]) => checkModel(m, "The " + k.replace("_", "-way / ") + "-lane model", bad));
+    if (v.cost < 0 || v.maint < 0) bad("Costs cannot be negative.");
+    if (v.maint === 0) warn("Maintenance 0 is treated by TF3 as 'not set': it then charges a sixth of the build cost every year. Use 1 for 'practically free'.");
+    if (v.year < 0 || v.year > 2200) bad("Available-from year must be between 0 and 2200.");
+    if (v.scale <= 0) bad("Scale must be greater than zero.");
+    if (Math.abs(v.dx) > 9 || Math.abs(v.dy) > 9) warn("A large offset moves the model away from its origin, but Pay Your Tolls counts around the model's origin in the world. Keep the origin on the road centreline.");
+    if (!msgs.some((m) => m.level === "bad")) msgs.unshift({ level: "ok", t: "Ready. Pay Your Tolls (TF3) will recognise every placed " + (v.model || "model") + " by its name and count traffic in an 18 m circle around it." });
+    return msgs;
+  }
+
+  function transf(v) {
+    const a = v.rot * Math.PI / 180, c = Math.cos(a) * v.scale, s = Math.sin(a) * v.scale;
+    return [c, s, 0, 0, -s, c, 0, 0, 0, 0, v.scale, 0, v.dx, v.dy, v.dz, 1].map(r6).join(", ");
+  }
+
+  function generate(v) {
+    const base = slug(v.name);
+    const perLayout = Object.keys(v.models).length > 0;
+    const id = (file) => luaStr(v.modid + "::/" + v.folder + "/" + file);
+
+    // ---- .con.lua
+    const C = [];
+    C.push("-- " + base + ".con.lua -- " + v.name + ": a Pay Your Tolls (TF3) compatible toll gate.");
+    C.push("-- Generated with the PYT Gate Generator (https://themanhun.github.io/pyt-gate-generator/).");
+    C.push("-- Free to use and modify with credit to Pay Your Tolls (PYT Compatibility Licence v1).");
+    C.push("-- Pay Your Tolls finds the placed MODEL by its file name (pyt_gate_...) and counts traffic in an");
+    C.push("-- 18 m circle around the model's origin. Without Pay Your Tolls this is simply a decoration.");
+    C.push("function data()");
+    C.push("\treturn {");
+    C.push("\t\tdescription = {");
+    C.push("\t\t\tname = _(" + luaStr(v.name) + "),");
+    C.push("\t\t\tdescription = _(" + luaStr(v.desc || v.name) + "),");
+    C.push("\t\t\ticon = " + luaStr(base + ".tga") + ", -- " + base + "@2x.tga, 240 x 150, in this folder");
+    C.push("\t\t\tpreviewIcon = " + luaStr(base + "_preview.tga") + ", -- " + base + "_preview@2x.tga, 720 x 405 (needed: without it the box is blue)");
+    C.push("\t\t},");
+    C.push("\t\tavailability = { yearFrom = " + Math.round(v.year) + ", yearTo = 0 },");
+    C.push("\t\tmenuCategory = { categories = { { category = \"street_constructions\", order = " + Math.round(v.order) + " } } }, -- road menu > Road Constructions");
+    if (perLayout) {
+      C.push("\t\tparams = {");
+      C.push("\t\t\t{ key = \"pyt_direction\", name = _(\"Direction\"), values = { _(\"One-way\"), _(\"Two-way\") }, defaultIndex = 1, displayMode = \"Horizontal\" },");
+      C.push("\t\t\t{ key = \"pyt_lanes\", name = _(\"Lanes\"), values = { \"1\", \"2\", \"3\" }, defaultIndex = 1, displayMode = \"Horizontal\" },");
+      C.push("\t\t},");
+    } else {
+      C.push("\t\tparams = { },");
+    }
+    C.push("\t\torder = " + Math.round(v.order) + ",");
+    C.push("\t\tupdateScript = {");
+    C.push("\t\t\tfileName = " + luaStr(v.modid + "::/" + v.folder + "/" + base + ".script@updateFn") + ",");
+    C.push("\t\t\tparams = {");
+    C.push("\t\t\t\tmodel = " + id(v.model) + ",");
+    if (perLayout) {
+      C.push("\t\t\t\tmodels = { -- direction (1 one-way, 2 two-way) _ lanes (1-3)");
+      LAYOUTS.forEach(([w, l]) => C.push("\t\t\t\t\t[\"" + w + "_" + l + "\"] = " + id(v.models[w + "_" + l] || v.model) + ","));
+      C.push("\t\t\t\t},");
+    }
+    C.push("\t\t\t\tcost = " + Math.round(v.cost) + ", -- TF3 scales it with the era");
+    C.push("\t\t\t\tmaintenance = " + Math.round(v.maint) + ", -- a year; 0 would mean cost / 6 a year");
+    C.push("\t\t\t},");
+    C.push("\t\t},");
+    C.push("\t}");
+    C.push("end");
+    C.push("");
+
+    // ---- .script.lua
+    const S = [];
+    S.push("-- " + base + ".script.lua -- places " + v.name + " (PYT Gate Generator, Pay Your Tolls TF3 compatible).");
+    S.push("-- A model-only construction: TF3 places it as a free-standing decoration, which is what Pay Your Tolls");
+    S.push("-- looks for. No dependency on Pay Your Tolls.");
+    S.push("local TRANSF = { " + transf(v) + " }");
+    S.push("");
+    if (perLayout) {
+      S.push("-- TF3 hands a construction choice over as the index of the chosen value, counting from 1");
+      S.push("local function choice(params, key, count, default)");
+      S.push("\tlocal v = tonumber(params and params[key])");
+      S.push("\tif v == nil then return default end");
+      S.push("\tv = math.floor(v)");
+      S.push("\tif v < 1 then v = 1 end");
+      S.push("\tif v > count then v = count end");
+      S.push("\treturn v");
+      S.push("end");
+      S.push("");
+    }
+    S.push("function data()");
+    S.push("\treturn {");
+    S.push("\t\tupdateFn = function(captureParams, params)");
+    S.push("\t\t\tlocal model = captureParams.model");
+    if (perLayout) {
+      S.push("\t\t\tlocal key = choice(params, \"pyt_direction\", 2, 2) .. \"_\" .. choice(params, \"pyt_lanes\", 3, 2)");
+      S.push("\t\t\tmodel = captureParams.models[key] or model");
+    }
+    S.push("\t\t\treturn {");
+    S.push("\t\t\t\tsubconstructions = { {");
+    S.push("\t\t\t\t\tmodels = { { id = model, transf = TRANSF } },");
+    S.push("\t\t\t\t\tterrainAlignmentLists = { { type = \"EQUAL\", faces = { } } },");
+    S.push("\t\t\t\t} },");
+    S.push("\t\t\t\tcost = captureParams.cost,");
+    S.push("\t\t\t\tmaintenanceCost = captureParams.maintenance,");
+    S.push("\t\t\t}");
+    S.push("\t\tend,");
+    S.push("\t}");
+    S.push("end");
+    S.push("");
+
+    // ---- _content.json lines
+    const files = [base + ".con.lua", base + ".script.lua", base + ".tga", base + "@2x.tga", base + "_preview.tga", base + "_preview@2x.tga"];
+    const mdls = [v.model].concat(Object.values(v.models)).filter((m, i, a) => m && a.indexOf(m) === i);
+    const J = [];
+    J.push("// Add these to the \"files\" list in your mod's _content.json:");
+    files.concat(mdls).forEach((f) => J.push("\"" + v.folder + "/" + f + "\","));
+    J.push("// ...and every mesh (.msh, .msh.blob), material (.mtl) and texture (.dds) your model uses,");
+    J.push("// e.g. \"" + v.folder + "/msh/...\" and \"" + v.folder + "/mat/...\".");
+
+    return [
+      { tab: base + ".con.lua", path: "content/" + v.folder + "/" + base + ".con.lua", file: base + ".con.lua", code: C.join("\n"), lua: true },
+      { tab: base + ".script.lua", path: "content/" + v.folder + "/" + base + ".script.lua", file: base + ".script.lua", code: S.join("\n"), lua: true },
+      { tab: "_content.json", path: "_content.json (add these lines)", file: "content_json_lines.txt", code: J.join("\n") + "\n", lua: false },
+    ];
+  }
+
+  function highlight(code, lua) {
+    const esc = code.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    return esc.split("\n").map((line) => {
+      const mark = lua ? "--" : "//";
+      const i = line.indexOf(mark);
+      let body = line, cmt = "";
+      const inString = i >= 0 && (line.slice(0, i).split('"').length - 1) % 2 === 1; // an odd number of quotes before it
+      if (i >= 0 && !inString) { body = line.slice(0, i); cmt = line.slice(i); }
+      body = body.replace(/"(?:[^"\\]|\\.)*"/g, (m) => '<span class="s">' + m + "</span>");
+      if (lua) body = body.replace(/\b(local|function|return|end|if|then|elseif|else|or|and|nil)\b/g, '<span class="k">$1</span>');
+      return body + (cmt ? '<span class="c">' + cmt + "</span>" : "");
+    }).join("\n");
+  }
+
+  let files = [], tab = 0, blocked = false;
+  function show() {
+    const f = files[tab];
+    if (!f) return;
+    [0, 1, 2].forEach((i) => $("t3tab" + i).setAttribute("aria-selected", i === tab ? "true" : "false"));
+    $("t3path").innerHTML = "";
+    const b = document.createElement("b"); b.textContent = f.path; $("t3path").appendChild(b);
+    $("t3code").innerHTML = highlight(f.code, f.lua);
+  }
+  function render() {
+    const v = read();
+    const msgs = validate(v);
+    files = generate(v);
+    $("t3tab0").textContent = files[0].tab;
+    $("t3tab1").textContent = files[1].tab;
+    document.querySelectorAll(".t3folderOut").forEach((e) => { e.textContent = v.folder || "your_folder"; });
+    document.querySelectorAll(".t3slugOut").forEach((e) => { e.textContent = slug(v.name); });
+    const status = $("t3status"); status.innerHTML = "";
+    msgs.forEach((m) => { const d = document.createElement("div"); d.className = "msg " + m.level; d.textContent = m.t; status.appendChild(d); });
+    blocked = msgs.some((m) => m.level === "bad");
+    $("t3copyBtn").disabled = blocked; $("t3dlBtn").disabled = blocked;
+    $("t3model").setAttribute("aria-invalid", /^pyt_gate_[a-z0-9_]+\.mdl$/.test(v.model) ? "false" : "true");
+    $("t3modid").setAttribute("aria-invalid", /^[a-z0-9_]+$/.test(v.modid) ? "false" : "true");
+    $("t3folder").setAttribute("aria-invalid", /^[a-z0-9_]+$/.test(v.folder) ? "false" : "true");
+    $("t3name").setAttribute("aria-invalid", v.name ? "false" : "true");
+    show();
+  }
+  function toast(text) {
+    const t = $("t3toast"); t.textContent = text; t.style.opacity = "1";
+    setTimeout(() => { t.style.opacity = "0"; }, 1800);
+  }
+
+  [0, 1, 2].forEach((i) => $("t3tab" + i).addEventListener("click", () => { tab = i; show(); }));
+  $("t3copyBtn").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(files[tab].code); toast("Copied"); }
+    catch (e) {
+      const r = document.createRange(); r.selectNodeContents($("t3code"));
+      const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      toast("Select all and copy");
+    }
+  });
+  $("t3dlBtn").addEventListener("click", () => {
+    try {
+      const blob = new Blob([files[tab].code], { type: "text/plain" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = files[tab].file;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      toast("Saved");
+    } catch (e) { toast("Use Copy"); }
+  });
+  $("form3").addEventListener("input", render);
+  $("form3").addEventListener("change", render);
+  // Simple / Advanced also changes what TF3 shows
+  $("modeSimple").addEventListener("click", render);
+  $("modeAdvanced").addEventListener("click", render);
+
+  // ---- the TF2 / TF3 switch (remembered; #tf3 in the address opens TF3)
+  function setGame(g) {
+    document.body.dataset.game = g;
+    $("gameTf2").setAttribute("aria-pressed", g === "tf2" ? "true" : "false");
+    $("gameTf3").setAttribute("aria-pressed", g === "tf3" ? "true" : "false");
+    try { localStorage.setItem("pytgen.game", g); } catch (e) {}
+    if (g === "tf3") render();
+  }
+  $("gameTf2").addEventListener("click", () => setGame("tf2"));
+  $("gameTf3").addEventListener("click", () => setGame("tf3"));
+  let start = "tf2";
+  try { start = localStorage.getItem("pytgen.game") || "tf2"; } catch (e) {}
+  if (/tf3/i.test(location.hash)) start = "tf3";
+  if (/tf2/i.test(location.hash)) start = "tf2";
+  setGame(start === "tf3" ? "tf3" : "tf2");
+  render();
+})();
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (() => {
@@ -677,6 +1092,10 @@
   const dlBtn = document.getElementById("dlBtn");
   if (copyBtn) copyBtn.addEventListener("click", trackGeneration);
   if (dlBtn) dlBtn.addEventListener("click", trackGeneration);
+  ["t3copyBtn", "t3dlBtn"].forEach((id) => {
+    const b = document.getElementById(id);
+    if (b) b.addEventListener("click", trackGeneration);
+  });
 
   sb.rpc("get_pyt_stats")
     .then(({ data, error }) => {
