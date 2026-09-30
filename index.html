@@ -248,6 +248,7 @@
 
   <p class="proof">Pay Your Tolls is currently used by <strong><span id="steamSubs">1,136</span> players</strong> on Steam. <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3800813265">Workshop page</a></p>
   <p class="proof" id="steamExtra" hidden><strong id="steamViews">&mdash;</strong> unique visitors &middot; <strong id="steamFavs">&mdash;</strong> favorites &middot; <strong id="steamConv">&mdash;</strong> of visitors subscribe</p>
+  <p class="proof" id="modioLine" hidden>On Transport Fever 3: <strong id="modioSubs">&mdash;</strong> players on mod.io (PC, Xbox, PlayStation) &middot; <strong id="modioPct">&mdash;</strong> positive &middot; <a href="https://mod.io/g/transportfever3/m/pay-your-tolls">mod.io page</a></p>
   <p class="proof" id="steamAge"></p>
   <p class="proof" id="pytStats" hidden><strong id="pytVisitors">&mdash;</strong> modders visited &middot; <strong id="pytGenerated">&mdash;</strong> gate scripts generated &middot; <strong id="pytLiveMods">&mdash;</strong> <span id="pytLiveModsWord">live mods</span> using the format</p>
 
@@ -1159,6 +1160,21 @@
   };
   tickAge();
   setInterval(tickAge, 30000);
+
+  // Pay Your Tolls TF3 on mod.io, written by the same local sync app into pyt_modio_stats (anon: SELECT only).
+  // The line stays hidden until the app has written real numbers.
+  sb.from("pyt_modio_stats")
+    .select("subscribers_total,ratings_percent")
+    .eq("id", 1)
+    .maybeSingle()
+    .then(({ data, error }) => {
+      if (error || !data || typeof data.subscribers_total !== "number" || data.subscribers_total <= 0) return;
+      document.getElementById("modioSubs").textContent = data.subscribers_total.toLocaleString();
+      document.getElementById("modioPct").textContent =
+        typeof data.ratings_percent === "number" ? data.ratings_percent + "%" : "—";
+      document.getElementById("modioLine").hidden = false;
+    })
+    .catch(() => {});
 
   // Live Steam subscriber count, written by the local PYT Steam Stats Sync
   // app into pyt_steam_stats (anon has SELECT only). On any failure the
